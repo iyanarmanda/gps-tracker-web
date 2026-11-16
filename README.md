@@ -1,35 +1,43 @@
-# React + TypeScript + Vite
+<p align="center">
+  <a href="https://vite.dev/" target="blank"><img src="./public/favicon.svg" width="120" alt="Nest Logo" /></a>
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+## Description
 
-Currently, two official plugins are available:
+GPS Tracker website client built with [React](https://react.dev/) and [Vite](https://vite.dev/).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Prerequisites
 
-## React Compiler
+- [node.js (>= v24)](https://nodejs.org/en)
+- [pnpm (>= v12)](https://pnpm.io/id)
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+## Project setup
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+$ pnpm install
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Create `.env` variables based on `.env.example`.
+
+## Compile and run the project
+
+```bash
+# development mode
+$ pnpm run start:dev
+
+# build
+$ pnpm run build
+
+# production mode
+$ pnpm run start:prod
+```
+
+## Run Linter and Type-check
+
+```bash
+# linter
+$ pnpm run lint
+
+# type-check
+$ pnpm run check
+```

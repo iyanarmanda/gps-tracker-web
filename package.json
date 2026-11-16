@@ -8,7 +8,8 @@
     "start:dev": "vite",
     "start:prod": "vite preview",
     "check": "tsc --noEmit",
-    "lint": "oxlint"
+    "lint": "oxlint",
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.5",
@@ -29,5 +30,6 @@
     "oxlint": "^1.90.0",
     "typescript": "~7.0.2",
     "vite": "^8.3.6"
-  }
+  },
+  "packageManager": "pnpm@12.20.0"
 }
