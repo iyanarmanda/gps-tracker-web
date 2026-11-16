@@ -1,12 +1,20 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DeviceCard } from '../components/ui/DeviceCard';
-import { useMainLayout } from '../layouts/MainLayout';
-import { fetchDevices, sendDeviceCommand } from '../services/devices.api';
-
+import { TrackerMap } from '../components/ui/TrackerMap';
+import { useMainLayout } from '../layouts/useMainLayout';
+import {
+  fetchDevices,
+  getDeviceStreamUrl,
+  sendDeviceCommand,
+} from '../services/devices.api';
+import type {
+  DeviceStatusStreamEvent,
+  DeviceTelemetryStreamEvent,
+} from '../services/interfaces/device-stream.interface';
 import type { Device } from '../services/interfaces/device.interface';
 
 const Home = () => {
-  const { setDeviceStats } = useMainLayout();
+  const { setDeviceStats, setStreamStatus } = useMainLayout();
 
   const [devices, setDevices] = useState<Device[]>([]);
   const [selectedEspId, setSelectedEspId] = useState<string | null>(null);
@@ -16,9 +24,35 @@ const Home = () => {
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const loadDevices = useCallback(async () => {
+  useEffect(() => {
+    let isMounted = true;
+
+    fetchDevices()
+      .then((data) => {
+        if (!isMounted) return;
+        setErrorMessage(null);
+        setDevices(data);
+        setSelectedEspId((prev) => prev ?? data[0]?.espId ?? null);
+      })
+      .catch((error: unknown) => {
+        if (!isMounted) return;
+        setErrorMessage(
+          error instanceof Error ? error.message : 'Failed to load devices',
+        );
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleRefresh = async () => {
+    setErrorMessage(null);
+    setIsLoading(true);
     try {
-      setErrorMessage(null);
       const data = await fetchDevices();
       setDevices(data);
       setSelectedEspId((prev) => prev ?? data[0]?.espId ?? null);
@@ -29,13 +63,67 @@ const Home = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  };
 
   useEffect(() => {
-    void loadDevices();
-  }, [loadDevices]);
+    const eventSource = new EventSource(getDeviceStreamUrl());
 
-  // Sinkronisasi statistik header pada MainLayout setiap kali state devices berubah
+    eventSource.onopen = () => {
+      setStreamStatus('connected');
+    };
+
+    eventSource.onerror = () => {
+      setStreamStatus(
+        eventSource.readyState === EventSource.CLOSED
+          ? 'disconnected'
+          : 'connecting',
+      );
+    };
+
+    eventSource.addEventListener('telemetry', (event: MessageEvent<string>) => {
+      const payload = JSON.parse(event.data) as DeviceTelemetryStreamEvent;
+
+      setDevices((prev) =>
+        prev.map((item) =>
+          item.espId === payload.espId
+            ? {
+                ...item,
+                isActive: payload.active,
+                location: {
+                  lat: payload.lat,
+                  lng: payload.lng,
+                  speed: payload.speed,
+                  satellites: payload.satellites,
+                  updatedAt: payload.updatedAt,
+                },
+              }
+            : item,
+        ),
+      );
+    });
+
+    eventSource.addEventListener('status', (event: MessageEvent<string>) => {
+      const payload = JSON.parse(event.data) as DeviceStatusStreamEvent;
+
+      setDevices((prev) =>
+        prev.map((item) =>
+          item.espId === payload.espId
+            ? {
+                ...item,
+                isActive: payload.active,
+                interval: payload.interval,
+              }
+            : item,
+        ),
+      );
+    });
+
+    return () => {
+      eventSource.close();
+      setStreamStatus('disconnected');
+    };
+  }, [setStreamStatus]);
+
   useEffect(() => {
     const activeCount = devices.filter((d) => d.isActive).length;
     setDeviceStats({ active: activeCount, total: devices.length });
@@ -106,11 +194,13 @@ const Home = () => {
 
   return (
     <div className="flex h-full w-full flex-col lg:flex-row">
-      {/* Slot Kanvas Peta */}
-      <section className="relative flex min-h-0 flex-1 items-center justify-center bg-slate-200/70">
-        <p className="rounded-md border border-slate-300 bg-white/80 px-3 py-1.5 text-xs font-medium text-slate-600">
-          Map Canvas Area {selectedEspId ? `(Selected: ${selectedEspId})` : ''}
-        </p>
+      {/* Kanvas Peta Leaflet */}
+      <section className="relative min-h-0 flex-1 bg-slate-200/70">
+        <TrackerMap
+          devices={devices}
+          selectedEspId={selectedEspId}
+          onSelectDevice={setSelectedEspId}
+        />
       </section>
 
       {/* Sidebar Daftar & Kontrol Device */}
@@ -121,7 +211,7 @@ const Home = () => {
           </h2>
           <button
             type="button"
-            onClick={() => void loadDevices()}
+            onClick={() => void handleRefresh()}
             className="text-xs font-medium text-slate-600 hover:text-slate-900"
           >
             Refresh

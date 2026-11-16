@@ -39,3 +39,8 @@ export async function sendDeviceCommand(
 
   return (await response.json()) as SendCommandResponse;
 }
+
+export function getDeviceStreamUrl(): string {
+  return `${API_BASE_URL}/v1/devices/stream`;
+}
+

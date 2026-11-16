@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Outlet, useOutletContext } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import '../components/styles/global.css';
 
 import type { MainLayoutContext, StreamStatus } from './interfaces/main-layout-context.interface';
@@ -9,7 +9,7 @@ const STATUS_CONFIG: Record<
   { label: string; dotClass: string; badgeClass: string }
 > = {
   connected: {
-    label: 'Stream Live',
+    label: 'Stream',
     dotClass: 'bg-emerald-500 animate-pulse',
     badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-700',
   },
@@ -24,10 +24,6 @@ const STATUS_CONFIG: Record<
     badgeClass: 'border-rose-200 bg-rose-50 text-rose-700',
   },
 };
-
-export function useMainLayout() {
-  return useOutletContext<MainLayoutContext>();
-}
 
 const MainLayout = () => {
   const [streamStatus, setStreamStatus] = useState<StreamStatus>('connecting');
