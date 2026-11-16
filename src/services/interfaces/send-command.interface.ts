@@ -1,4 +1,5 @@
 import type { IntervalOptions } from '../../constants/interval.constant';
+import type { Device } from './device.interface';
 
 export interface SendCommandPayload {
   active: boolean;

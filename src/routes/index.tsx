@@ -2,16 +2,11 @@ import { useEffect, useState } from 'react';
 import { DeviceCard } from '../components/ui/DeviceCard';
 import { TrackerMap } from '../components/ui/TrackerMap';
 import { useMainLayout } from '../layouts/useMainLayout';
-import {
-  fetchDevices,
-  getDeviceStreamUrl,
-  sendDeviceCommand,
-} from '../services/devices.api';
-import type {
-  DeviceStatusStreamEvent,
-  DeviceTelemetryStreamEvent,
-} from '../services/interfaces/device-stream.interface';
+import { fetchDevices, getDeviceStreamUrl, sendDeviceCommand } from '../services/devices.api';
+
+import type { DeviceStatusStreamEvent, DeviceTelemetryStreamEvent } from '../services/interfaces/device-stream.interface';
 import type { Device } from '../services/interfaces/device.interface';
+import type { IntervalOptions } from '../constants/interval.constant';
 
 const Home = () => {
   const { setDeviceStats, setStreamStatus } = useMainLayout();
@@ -160,7 +155,10 @@ const Home = () => {
     }
   };
 
-  const handleChangeInterval = async (device: Device, nextInterval: number) => {
+  const handleChangeInterval = async (
+    device: Device,
+    nextInterval: IntervalOptions,
+  ) => {
     if (nextInterval === device.interval) return;
 
     setSubmittingIds((prev) => ({ ...prev, [device.espId]: true }));

@@ -1,6 +1,6 @@
 import { INTERVAL_OPTIONS } from '../../constants/interval.constant';
 
-import type { Device } from '../../services/devices.api';
+import type { Device } from '../../services/interfaces/device.interface';
 import type { IntervalOptions } from '../../constants/interval.constant';
 
 interface DeviceCardProps {
@@ -98,11 +98,11 @@ export const DeviceCard = ({
           disabled={isSubmitting}
           value={device.interval}
           onChange={(e) => 
-            onChangeInterval(device, Number(e.target.value) as IntervalOptions
-          )}
+            onChangeInterval(device, Number(e.target.value) as IntervalOptions)
+          }
           className="rounded-md border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-800 focus:border-slate-900 focus:outline-none disabled:opacity-50"
         >
-          {!INTERVAL_OPTIONS.includes(device.interval) && (
+          {!(INTERVAL_OPTIONS as readonly number[]).includes(device.interval) && (
             <option value={device.interval}>{device.interval}s</option>
           )}
           {INTERVAL_OPTIONS.map((sec) => (
