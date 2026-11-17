@@ -1,27 +1,34 @@
 import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import '../components/styles/global.css';
+import { Badge } from '@/components/ui/badge';
+import '@/components/styles/global.css';
 
 import type { MainLayoutContext, StreamStatus } from './interfaces/main-layout-context.interface';
 
 const STATUS_CONFIG: Record<
   StreamStatus,
-  { label: string; dotClass: string; badgeClass: string }
+  {
+    label: string;
+    dotClass: string;
+    variant: 'outline' | 'secondary' | 'destructive';
+    badgeClass?: string;
+  }
 > = {
   connected: {
     label: 'Stream',
     dotClass: 'bg-emerald-500 animate-pulse',
-    badgeClass: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+    variant: 'outline',
+    badgeClass: 'border-emerald-500/30 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400',
   },
   connecting: {
     label: 'Connecting...',
     dotClass: 'bg-amber-500 animate-ping',
-    badgeClass: 'border-amber-200 bg-amber-50 text-amber-700',
+    variant: 'secondary',
   },
   disconnected: {
     label: 'Offline',
-    dotClass: 'bg-rose-500',
-    badgeClass: 'border-rose-200 bg-rose-50 text-rose-700',
+    dotClass: 'bg-white',
+    variant: 'destructive',
   },
 };
 
@@ -32,39 +39,40 @@ const MainLayout = () => {
   const currentStatus = STATUS_CONFIG[streamStatus];
 
   return (
-    <div className="flex h-dvh w-screen flex-col overflow-hidden bg-slate-100 text-slate-900">
+    <div className="flex h-dvh w-screen flex-col overflow-hidden bg-muted/30 text-foreground">
       {/* Top Bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 shadow-xs">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b bg-background px-4">
         <div className="flex items-center gap-3">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-xs font-bold text-white">
-            GPS
-          </div>
           <div>
-            <h1 className="text-sm font-semibold leading-tight text-slate-900">
-              IoT GPS Tracker
+            <h1 className="text-sm font-semibold leading-tight">
+              GPS Tracker
             </h1>
-            <p className="text-xs text-slate-500">
-              Real-Time Telemetry &amp; Device Control
+            <p className="text-xs text-muted-foreground">
+              Real-Time Telemetry & Device Control
             </p>
           </div>
         </div>
 
         {/* Status Indicators */}
-        <div className="flex items-center gap-3">
-          <div className="hidden items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium text-slate-700 sm:flex">
-            <span className="text-slate-400">Active:</span>
-            <span className="font-semibold text-slate-900">
+        <div className="flex items-center gap-2.5">
+          <Badge
+            variant="secondary"
+            className="hidden gap-1.5 font-normal sm:inline-flex"
+          >
+            <span className="text-muted-foreground">Active:</span>
+            <span className="font-semibold text-foreground">
               {deviceStats.active}
             </span>
-            <span className="text-slate-400">/ {deviceStats.total}</span>
-          </div>
+            <span className="text-muted-foreground">/ {deviceStats.total}</span>
+          </Badge>
 
-          <div
-            className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium ${currentStatus.badgeClass}`}
+          <Badge
+            variant={currentStatus.variant}
+            className={`gap-2 ${currentStatus.badgeClass ?? ''}`}
           >
             <span className={`h-2 w-2 rounded-full ${currentStatus.dotClass}`} />
             <span>{currentStatus.label}</span>
-          </div>
+          </Badge>
         </div>
       </header>
 

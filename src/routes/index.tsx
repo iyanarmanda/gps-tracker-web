@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
-import { DeviceCard } from '../components/ui/DeviceCard';
-import { TrackerMap } from '../components/ui/TrackerMap';
-import { useMainLayout } from '../layouts/useMainLayout';
-import { fetchDevices, getDeviceStreamUrl, sendDeviceCommand } from '../services/devices.api';
+import { DeviceCard } from '@/components/DeviceCard';
+import { TrackerMap } from '@/components/TrackerMap';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { IntervalOptions } from '@/constants/interval.constant';
+import { useMainLayout } from '@/layouts/useMainLayout';
+import { fetchDevices, getDeviceStreamUrl, sendDeviceCommand } from '@/services/devices.api';
 
-import type { DeviceStatusStreamEvent, DeviceTelemetryStreamEvent } from '../services/interfaces/device-stream.interface';
-import type { Device } from '../services/interfaces/device.interface';
-import type { IntervalOptions } from '../constants/interval.constant';
+import type { DeviceStatusStreamEvent, DeviceTelemetryStreamEvent } from '@/services/interfaces/device-stream.interface';
+import type { Device } from '@/services/interfaces/device.interface';
 
 const Home = () => {
   const { setDeviceStats, setStreamStatus } = useMainLayout();
@@ -192,8 +195,7 @@ const Home = () => {
 
   return (
     <div className="flex h-full w-full flex-col lg:flex-row">
-      {/* Kanvas Peta Leaflet */}
-      <section className="relative min-h-0 flex-1 bg-slate-200/70">
+      <section className="relative min-h-0 flex-1 bg-muted/40">
         <TrackerMap
           devices={devices}
           selectedEspId={selectedEspId}
@@ -201,34 +203,41 @@ const Home = () => {
         />
       </section>
 
-      {/* Sidebar Daftar & Kontrol Device */}
-      <aside className="flex h-80 w-full shrink-0 flex-col border-t border-slate-200 bg-white lg:h-full lg:w-96 lg:border-t-0 lg:border-l">
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <h2 className="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+      <aside className="flex h-80 w-full shrink-0 flex-col border-t bg-background lg:h-full lg:w-96 lg:border-t-0 lg:border-l">
+        <div className="flex items-center justify-between border-b px-4 py-2.5">
+          <h2 className="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
             Registered Devices ({devices.length})
           </h2>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="sm"
+            disabled={isLoading}
             onClick={() => void handleRefresh()}
-            className="text-xs font-medium text-slate-600 hover:text-slate-900"
+            className="h-7 px-2 text-xs"
           >
             Refresh
-          </button>
+          </Button>
         </div>
 
         {errorMessage && (
-          <div className="border-b border-rose-200 bg-rose-50 px-4 py-2 text-xs text-rose-700">
-            {errorMessage}
+          <div className="border-b p-3">
+            <Alert variant="destructive" className="py-2">
+              <AlertDescription className="text-xs">
+                {errorMessage}
+              </AlertDescription>
+            </Alert>
           </div>
         )}
 
         <div className="flex-1 space-y-2.5 overflow-y-auto p-4">
           {isLoading ? (
-            <p className="text-center text-xs text-slate-400">
-              Loading devices...
-            </p>
+            <div className="space-y-2.5">
+              <Skeleton className="h-28 w-full rounded-lg" />
+              <Skeleton className="h-28 w-full rounded-lg" />
+            </div>
           ) : devices.length === 0 ? (
-            <p className="text-center text-xs text-slate-400">
+            <p className="py-8 text-center text-xs text-muted-foreground">
               No devices registered in database.
             </p>
           ) : (

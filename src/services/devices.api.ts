@@ -1,4 +1,4 @@
-import { API_BASE_URL } from '../constants/api.constant';
+import { API_BASE_URL } from '@/constants/api.constant';
 
 import type { Device } from './interfaces/device.interface';
 import type { SendCommandPayload, SendCommandResponse } from './interfaces/send-command.interface';
