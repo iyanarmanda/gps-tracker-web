@@ -64,7 +64,9 @@ const Home = () => {
   };
 
   useEffect(() => {
-    const eventSource = new EventSource(getDeviceStreamUrl());
+    const eventSource = new EventSource(getDeviceStreamUrl(), {
+      withCredentials: true,
+    });
 
     eventSource.onopen = () => {
       setStreamStatus('connected');

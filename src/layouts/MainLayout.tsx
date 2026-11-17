@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/auth.context';
 import '@/components/styles/global.css';
 
 import type { MainLayoutContext, StreamStatus } from './interfaces/main-layout-context.interface';
@@ -33,10 +35,24 @@ const STATUS_CONFIG: Record<
 };
 
 const MainLayout = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
   const [streamStatus, setStreamStatus] = useState<StreamStatus>('connecting');
   const [deviceStats, setDeviceStats] = useState({ active: 0, total: 0 });
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const currentStatus = STATUS_CONFIG[streamStatus];
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+      void navigate('/login', { replace: true });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <div className="flex h-dvh w-screen flex-col overflow-hidden bg-muted/30 text-foreground">
@@ -53,8 +69,8 @@ const MainLayout = () => {
           </div>
         </div>
 
-        {/* Status Indicators */}
-        <div className="flex items-center gap-2.5">
+        {/* Status Indicators & Logout */}
+          <div className="flex items-center gap-2.5">
           <Badge
             variant="secondary"
             className="hidden gap-1.5 font-normal sm:inline-flex"
@@ -73,6 +89,17 @@ const MainLayout = () => {
             <span className={`h-2 w-2 rounded-full ${currentStatus.dotClass}`} />
             <span>{currentStatus.label}</span>
           </Badge>
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            disabled={isLoggingOut}
+            onClick={() => void handleLogout()}
+            className="h-7 px-2.5 text-xs"
+          >
+            Logout
+          </Button>
         </div>
       </header>
 

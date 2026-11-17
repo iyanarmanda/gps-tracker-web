@@ -1,16 +1,28 @@
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { AuthProvider } from './contexts/AuthProvider';
 import MainLayout from './layouts/MainLayout.tsx';
 import Home from './routes';
+import Login from './routes/login';
 
 const router = createBrowserRouter([
   {
-    path: '/',
-    element: <MainLayout />,
+    path: '/login',
+    element: <Login />,
+  },
+  {
+    element: <ProtectedRoute />,
     children: [
       {
-        index: true,
-        element: <Home />
-      },
+        path: '/',
+        element: <MainLayout />,
+        children: [
+          {
+            index: true,
+            element: <Home />
+          },
+        ]
+      }
     ]
   },
   {
@@ -20,7 +32,11 @@ const router = createBrowserRouter([
 ]);
 
 const App = () => {
-  return <RouterProvider router={router} />;
+  return (
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
+  );
 };
 
 export default App;

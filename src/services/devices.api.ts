@@ -4,7 +4,13 @@ import type { Device } from './interfaces/device.interface';
 import type { SendCommandPayload, SendCommandResponse } from './interfaces/send-command.interface';
 
 export async function fetchDevices(): Promise<Device[]> {
-  const response = await fetch(`${API_BASE_URL}/v1/devices`);
+  const response = await fetch(`${API_BASE_URL}/v1/devices`, {
+    credentials: 'include',
+  });
+
+  if (response.status === 401) {
+    throw new Error('Session not found');
+  }
 
   if (!response.ok) {
     throw new Error(`Failed to fetch devices (HTTP ${String(response.status)})`);
@@ -24,9 +30,14 @@ export async function sendDeviceCommand(
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify(payload),
     },
   );
+
+  if (response.status === 401) {
+    throw new Error('Session not found');
+  }
 
   if (!response.ok) {
     const errorBody = (await response.json().catch(() => null)) as {
