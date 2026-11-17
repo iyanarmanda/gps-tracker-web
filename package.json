@@ -7,7 +7,7 @@
     "build": "tsc -b && vite build",
     "start:dev": "vite",
     "start:prod": "vite preview",
-    "check": "tsc --noEmit",
+    "check": "tsc -b --noEmit",
     "lint": "oxlint",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky"
